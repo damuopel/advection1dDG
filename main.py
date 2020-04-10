@@ -26,12 +26,16 @@ def Mesh(l,nElms):
     Topology = np.array([n1,n2])
     return Topology,x
 
-def Initial_Conditions(nNodes):
-    u0 = np.zeros([nNodes,1])
+def Initial_Conditions(dofs):
+    u0 = np.zeros([dofs,1])
     return u0
 
-def Boundary_Conditions():
-    return u
+def Boundary_Conditions(x,iStep):
+    dofs = np.size(x)
+    rDofs = 0
+    u = np.zeros([dofs,1])
+    u[rDofs] = np.sin((2*np.pi)*iStep/5);
+    return u,rDofs
 
 def Operators(Topology,XYZ,u0,ud):
     return M,C,m
@@ -40,13 +44,17 @@ def Advection_Velocity():
     a = 1
     return a
 
-def Runge_Kutta():
+def Runge_Kutta(Topology,x,):
     # Boundary Conditions
-    ud = Boundary_Conditions()
+    ud,rDofs = Boundary_Conditions(x)
     # Advection Velocity
     a = Advection_Velocity()
     # Get Operators
-    [M,C,m] = Operators(Topology,XYX,u0,ud,a)
+    [M,C,m] = Operators(Topology,XYX,u,a)
+    
+    def Residual(u,t):
+        return u
+    
     return u
 
 if __name__ == '__main__':
@@ -67,7 +75,7 @@ if __name__ == '__main__':
     # Temporal Integration
     steps = np.arange(0,time,incrTime) # One step less
     for index,iStep in enumerate(steps):
-        u = Runge_Kutta(u,iStep)
+        u = Runge_Kutta(Topology,x,u,iStep)
         results[:,index] = u
         
     # Plot Results
