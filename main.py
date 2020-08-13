@@ -2,6 +2,7 @@ import numpy as np
 from numpy.linalg import inv
 import matplotlib.pyplot as plt
 import sys
+import gif
 
 def Shape_Functions_1D(Xi,Degree,dFlag):
     if dFlag == 1:
@@ -130,6 +131,13 @@ def Runge_Kutta(u,iStep,incrTime):
     u = u + (R1+2*R2+2*R3+R4)*incrTime/6
     return u
 
+@gif.frame
+def plot(i):
+    plt.figure()
+    plt.xlim(0,l)
+    plt.ylim(-1,1)
+    plt.plot(x,results[:,i])
+
 if __name__ == '__main__':
     # User input
     fileName = sys.argv[0]
@@ -150,16 +158,9 @@ if __name__ == '__main__':
     for index,iStep in enumerate(steps):
         u = Runge_Kutta(u,iStep,incrTime)
         results[:,index] = u[:,0]
-    # Plot Results
-    fig = plt.figure()  
-    ax = fig.gca()
-    plt.xlim(0,l)
-    plt.ylim(-1,1)
-    fig.show()
+
+    frames = []
     for index,iStep in enumerate(steps):
-        ax.clear()
-        ax.plot(x,results[:,index])
-        plt.pause(incrTime)
-    plt.close(fig)
-               
-    
+        frame = plot(index)
+        frames.append(frame)
+    gif.save(frames,'Advection.gif',duration=50)
